@@ -36,10 +36,7 @@ def hand_points_and_labels(rgb_image_filepath):
         elif handedness_label == "Right":
             right_hand_pixels.append(pixels)
 
-    print(left_hand_pixels)
-    print(right_hand_pixels)
-
-    return np.array(left_hand_pixels, dtype=np.uint8), np.array(right_hand_pixels, dtype=np.uint8)
+    return np.array(left_hand_pixels, dtype=np.uint32), np.array(right_hand_pixels, dtype=np.uint32)
 
 
 if __name__ == "__main__":

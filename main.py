@@ -60,15 +60,15 @@ def main_function(input_video_filepath, output_video_filepath):
     # Process first frame for hand detection
     first_frame_path = os.path.join(config.video_frames_dir, frame_names[0])
     left_hand_pixels, right_hand_pixels = hand_points_and_labels(first_frame_path)
-    
+    left_hand_pixels = np.squeeze(left_hand_pixels)
+    right_hand_pixels = np.squeeze(right_hand_pixels)
+
     # Set up hand tracking
     ann_left_hand_obj_id, ann_right_hand_obj_id = 1, 2
     
     # Create labels for each hand
-    labels_left = np.ones(left_hand_pixels.shape[1], dtype=np.uint8)
-    labels_right = np.ones(right_hand_pixels.shape[1], dtype=np.uint8)
-
-    print(labels_left)
+    labels_left = np.ones(left_hand_pixels.shape[0], dtype=np.uint8)
+    labels_right = np.ones(right_hand_pixels.shape[0], dtype=np.uint8)
     
     # Process hands
     for hand_pixels, hand_id, labels in [
