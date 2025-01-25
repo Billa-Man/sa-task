@@ -8,6 +8,9 @@
     <td><img src="output/processed_frames/frame_0025.jpg"></td>
     <td><img src="output/processed_frames/frame_0197.jpg"></td>
   </tr>
+  <tr>
+      <td><img src="output_plot.png"></td>
+  </tr>
 </table>
 
 ## Technical Overview
