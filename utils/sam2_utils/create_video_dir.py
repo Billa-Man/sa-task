@@ -18,7 +18,7 @@ def extract_frames(video_path, output_dir, quality=100):
         return False
     
     frame_count = 0
-    with tqdm(total=total_frames, desc="Creating Frames", 
+    with tqdm(total=total_frames, desc="Extracting Frames", 
             unit="frames", bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]") as pbar:
         while True:
             ret, frame = cap.read()

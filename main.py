@@ -10,7 +10,8 @@ from sam2.build_sam import build_sam2_video_predictor
 
 from utils.sam2_utils.create_video_dir import extract_frames
 from utils.mediapipe.points_and_labels import hand_points_and_labels
-from utils.sam2_utils.save_video import save_output_video
+
+import cv2
 
 #---------- SET DEVICE ----------
 if torch.cuda.is_available():
@@ -75,8 +76,6 @@ def main_function(input_video_filepath, output_video_filepath):
         (left_hand_pixels, ann_left_hand_obj_id, labels_left),
         (right_hand_pixels, ann_right_hand_obj_id, labels_right)
     ]:
-        print(hand_pixels.shape)
-        print(labels.shape)
         predictor.add_new_points_or_box(
             inference_state=inference_state,
             frame_idx=0,
@@ -84,17 +83,46 @@ def main_function(input_video_filepath, output_video_filepath):
             points=hand_pixels,
             labels=labels
         )
-    
+
+    output_frames_dir = "./output/processed_frames/"
+    os.makedirs(output_frames_dir, exist_ok=True)
+
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    frame_width, frame_height = 1280, 720
+    output_fps = 30
+    video_writer = cv2.VideoWriter(output_video_filepath, fourcc, output_fps, (frame_width, frame_height))
+
     video_segments = {}  # This contains the per-frame segmentation results
     for out_frame_idx, out_obj_ids, out_mask_logits in predictor.propagate_in_video(inference_state):
+
         video_segments[out_frame_idx] = {
             out_obj_id: (out_mask_logits[i] > 0.0).cpu().numpy()
             for i, out_obj_id in enumerate(out_obj_ids)
         }
 
-    save_output_video(frame_names, video_segments, config.video_frames_dir, output_video_filepath)
-    
+        frame_path = os.path.join(config.video_frames_dir, frame_names[out_frame_idx])
+        frame = cv2.imread(frame_path)
+        frame = cv2.resize(frame, (frame_width, frame_height))
 
+        colored_mask = np.zeros_like(frame, dtype=np.uint8)
+        for obj_id, mask in video_segments[out_frame_idx].items():
+
+            mask = np.squeeze(mask)
+            mask = cv2.resize(mask.astype(np.uint8), (frame_width, frame_height), interpolation=cv2.INTER_NEAREST)
+
+            color = (0, 255, 0) if obj_id == 1 else (0, 0, 255)  # Green for left hand, Red for right hand
+            colored_mask[mask > 0] = color
+
+        alpha = 0.5
+        frame = cv2.addWeighted(frame, 1 - alpha, colored_mask, alpha, 0)
+
+        video_writer.write(frame)
+
+        frame_output_path = os.path.join(output_frames_dir, f"frame_{out_frame_idx:04d}.jpg")
+        cv2.imwrite(frame_output_path, frame)
+
+    video_writer.release()
+    
 #---------- MAIN FUNCTION ----------
 if __name__ == "__main__":
     input_video_filepath = "media/test.mp4"
