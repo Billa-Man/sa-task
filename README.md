@@ -29,33 +29,45 @@ The hand segmentation pipeline consists of two main stages:
 The system leverages SAM2's powerful segmentation capabilities by using detected hand points as prompting inputs, resulting in accurate hand region segmentation.
 
 ## Setup
-### 1. Clone this repository
+### 1. Create and activate a virtual environment
+```
+python3 -m venv sam2_env
+source sam2_env/bin/activate  # For Linux/Mac
+# or
+.\sa_env\Scripts\activate  # For Windows
+
+```
+### 2. Install project dependencies:
+```
+pip install -r requirements.txt
+```
+### 3. Clone this repository
 ```
 git clone https://github.com/Billa-Man/sa-task.git
 cd sa-task
 ```
 
-### 2. Install SAM2 (Segment Anything Model 2)
+### 4. Install SAM2 (Segment Anything Model 2)
 ```
 git clone https://github.com/facebookresearch/sam2.git && cd sam2
 
 pip install -e .
 ```
 
-### 3. Download required model checkpoints
+### 5. Download required model checkpoints
 ```
 cd checkpoints && \
 ./download_ckpts.sh && \
 cd ../..
 ```
 
-### 4. Configure Python Path
+### 6. Configure Python Path
 ```
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo $PYTHONPATH
 ```
 
-### 5. Launch the script
+### 7. Launch the script
 ```
 python3 main.py
 ```
